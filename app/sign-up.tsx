@@ -11,6 +11,7 @@ export default function SignUpScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [wing, setWing] = useState("");
   const [flatNumber, setFlatNumber] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -48,7 +49,7 @@ export default function SignUpScreen() {
   };
 
   const handleSignUp = async () => {
-    if (!fullName || !email || !password || !confirmPassword || !flatNumber) {
+    if (!fullName || !email || !password || !confirmPassword || !wing || !flatNumber) {
       Alert.alert("Error", "Please fill in all required fields");
       return;
     }
@@ -67,6 +68,7 @@ export default function SignUpScreen() {
       // Sign up with the selected user type
       await signUp(email, password, userType, {
         fullName,
+        wing,
         flatNumber,
         govtId,
         rentalAgreement
@@ -226,12 +228,24 @@ export default function SignUpScreen() {
             </Pressable>
           </View>
 
+          <Text style={styles.formLabel}>Wing</Text>
+          <View style={styles.inputContainer}>
+            <Home size={20} color="#666" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your wing (e.g., A, B, C)"
+              value={wing}
+              onChangeText={setWing}
+              editable={!isLoading}
+            />
+          </View>
+
           <Text style={styles.formLabel}>Flat Number</Text>
           <View style={styles.inputContainer}>
             <Home size={20} color="#666" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
-              placeholder="Enter your flat number (e.g., A-101)"
+              placeholder="Enter your flat number (e.g., 101, 202)"
               value={flatNumber}
               onChangeText={setFlatNumber}
               editable={!isLoading}

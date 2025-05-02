@@ -6,6 +6,7 @@ interface Visitor {
   id: string;
   name: string;
   visiting: string;
+  wing?: string;
   flat: string;
   purpose: string;
   date: string;

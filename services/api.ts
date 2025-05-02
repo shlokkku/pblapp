@@ -1,6 +1,6 @@
 // API service for making requests to the backend
 
-const API_BASE_URL = "http://192.168.1.3:5000/api";
+const API_BASE_URL = "http://192.168.1.15:5000/api";
 
 // Helper function to handle API responses
 const handleResponse = async (response: Response) => {
@@ -26,27 +26,6 @@ const createAuthHeaders = (token?: string) => {
 
 // API services organized by feature
 export const api = {
-  // Auth related endpoints
-  auth: {
-    signIn: async (email: string, password: string, userType: string) => {
-      const response = await fetch(`${API_BASE_URL}/auth/resident/signin`, {
-        method: 'POST',
-        headers: createAuthHeaders(),
-        body: JSON.stringify({ email, password, userType }),
-      });
-      return handleResponse(response);
-    },
-    
-    signUp: async (userData: any) => {
-      const response = await fetch(`${API_BASE_URL}/auth/resident/signup`, {
-        method: 'POST',
-        headers: createAuthHeaders(),
-        body: JSON.stringify(userData),
-      });
-      return handleResponse(response);
-    },
-  },
-  
   // Visitor related endpoints
   visitors: {
     getAll: async (token: string) => {
@@ -85,7 +64,7 @@ export const api = {
   // Notices related endpoints
   notices: {
     getAll: async (token: string) => {
-      const response = await fetch(`${API_BASE_URL}/notices`, {
+      const response = await fetch(`${API_BASE_URL}/notices/active`, {
         headers: createAuthHeaders(token),
       });
       return handleResponse(response);
@@ -111,7 +90,7 @@ export const api = {
   // Complaints related endpoints
   complaints: {
     getAll: async (token: string) => {
-      const response = await fetch(`${API_BASE_URL}/complaints`, {
+      const response = await fetch(`${API_BASE_URL}/api/complaints/my`, {
         headers: createAuthHeaders(token),
       });
       return handleResponse(response);
@@ -125,7 +104,7 @@ export const api = {
     },
     
     create: async (complaintData: any, token: string) => {
-      const response = await fetch(`${API_BASE_URL}/complaints`, {
+      const response = await fetch(`${API_BASE_URL}/api/complaints`, {
         method: 'POST',
         headers: createAuthHeaders(token),
         body: JSON.stringify(complaintData),
@@ -145,8 +124,8 @@ export const api = {
   
   // Dues related endpoints
   dues: {
-    getAll: async (token: string) => {
-      const response = await fetch(`${API_BASE_URL}/dues`, {
+    getAll: async (id:string ,token: string) => {
+      const response = await fetch(`${API_BASE_URL}/dues/${id}`, {
         headers: createAuthHeaders(token),
       });
       return handleResponse(response);

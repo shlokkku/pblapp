@@ -1,13 +1,13 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { api } from "../services/api";
 
 export type UserType = "owner" | "tenant" | "visitor";
 
 interface User {
   email: string;
   fullName?: string;
+  wing?: string;
   flatNumber?: string;
   govtId?: string | null;
   rentalAgreement?: string | null;
@@ -31,6 +31,8 @@ interface AuthState {
   clearError: () => void;
 }
 
+const API_BASE_URL = "http://192.168.1.15:5000/api";
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -44,7 +46,19 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ isLoading: true, error: null });
           
-          const data = await api.auth.signIn(email, password, userType);
+          const response = await fetch(`${API_BASE_URL}/auth/resident/signin`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password, userType }),
+          });
+          
+          const data = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(data.message || 'Failed to sign in');
+          }
           
           set({
             isAuthenticated: true,
@@ -52,6 +66,7 @@ export const useAuthStore = create<AuthState>()(
             user: {
               email,
               fullName: data.fullName || data.name,
+              wing: data.wing,
               flatNumber: data.flatNumber,
               token: data.token,
               ...data
@@ -76,11 +91,24 @@ export const useAuthStore = create<AuthState>()(
             password,
             userType,
             fullName: userData.fullName,
+            wing: userData.wing,
             flatNumber: userData.flatNumber,
             // Add other fields as needed
           };
           
-          const data = await api.auth.signUp(requestBody);
+          const response = await fetch(`${API_BASE_URL}/auth/resident/signup`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+          });
+          
+          const data = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(data.message || 'Failed to sign up');
+          }
           
           set({
             isAuthenticated: true,

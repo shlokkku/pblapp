@@ -10,9 +10,9 @@ export default function MyDetailsScreen() {
   const { user, userType } = useAuthStore();
   const { vehicles } = useVehicleStore();
   const router = useRouter();
-  const [expandedSection, setExpandedSection] = useState("vehicles");
+  const [expandedSection, setExpandedSection] = useState<string>("vehicles");
 
-  const handleViewDocument = (documentType) => {
+  const handleViewDocument = (documentType: string) => {
     router.push({
       pathname: "/view-document",
       params: { type: documentType }
@@ -23,16 +23,16 @@ export default function MyDetailsScreen() {
     router.push("/add-vehicle");
   };
 
-  const handleEditVehicle = (vehicleId) => {
+  const handleEditVehicle = (vehicleId: string) => {
     router.push({
       pathname: "/add-vehicle",
       params: { id: vehicleId, mode: "edit" }
     });
   };
 
-  const toggleSection = (section) => {
+  const toggleSection = (section: string) => {
     if (expandedSection === section) {
-      setExpandedSection(null);
+      setExpandedSection(""); // Use empty string instead of null
     } else {
       setExpandedSection(section);
     }
@@ -52,7 +52,10 @@ export default function MyDetailsScreen() {
           <View style={styles.profileInfo}>
             <Text style={styles.profileName}>{user?.fullName || "User"}</Text>
             <Text style={styles.profileDetail}>{userType.charAt(0).toUpperCase() + userType.slice(1)}</Text>
-            <Text style={styles.profileDetail}>Flat: {user?.flatNumber || "Not specified"}</Text>
+            <Text style={styles.profileDetail}>
+              {user?.wing ? `Wing ${user.wing}, ` : ""}
+              Flat: {user?.flatNumber || "Not specified"}
+            </Text>
           </View>
         </View>
 
@@ -105,7 +108,10 @@ export default function MyDetailsScreen() {
               
               <View style={styles.parkingInfoRow}>
                 <Text style={styles.parkingInfoLabel}>Assigned Spots:</Text>
-                <Text style={styles.parkingInfoValue}>A-12, B-15</Text>
+                <Text style={styles.parkingInfoValue}>
+                  {user?.wing ? `${user.wing}-` : ""}
+                  {user?.flatNumber ? `${user.flatNumber}A, ${user.flatNumber}B` : "Not assigned"}
+                </Text>
               </View>
               
               <View style={styles.parkingInfoRow}>
@@ -170,7 +176,10 @@ export default function MyDetailsScreen() {
                 
                 <View style={styles.parkingSpot}>
                   <MapPin size={16} color="#3b5998" />
-                  <Text style={styles.parkingSpotText}>Assigned Spot: {vehicle.parkingSpot || "Pending"}</Text>
+                  <Text style={styles.parkingSpotText}>
+                    Assigned Spot: {user?.wing ? `${user.wing}-` : ""}
+                    {vehicle.parkingSpot || "Pending"}
+                  </Text>
                 </View>
               </View>
             ))}

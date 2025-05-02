@@ -9,16 +9,24 @@ import { useVisitorStore } from "@/store/visitorStore";
 export default function VisitorScreen() {
   const router = useRouter();
   const { signOut, user } = useAuthStore();
-  const { registerVisitor, isLoading, error } = useVisitorStore();
+  const { registerVisitor, visitors, fetchVisitors, isLoading, error } = useVisitorStore();
   
   const [residentName, setResidentName] = useState("");
+  const [wing, setWing] = useState("");
   const [flatNumber, setFlatNumber] = useState("");
   const [purpose, setPurpose] = useState("");
   const [visitDate, setVisitDate] = useState("");
   const [visitTime, setVisitTime] = useState("");
 
+  // Fetch visitor's upcoming visits
+  React.useEffect(() => {
+    if (user?.token) {
+      fetchVisitors();
+    }
+  }, [user]);
+
   const handleRequestVisit = async () => {
-    if (!residentName || !flatNumber || !purpose || !visitDate || !visitTime) {
+    if (!residentName || !wing || !flatNumber || !purpose || !visitDate || !visitTime) {
       Alert.alert("Error", "Please fill in all fields");
       return;
     }
@@ -27,6 +35,7 @@ export default function VisitorScreen() {
       await registerVisitor({
         name: user?.fullName || "Visitor",
         visiting: residentName,
+        wing,
         flat: flatNumber,
         purpose,
         date: visitDate,
@@ -37,6 +46,7 @@ export default function VisitorScreen() {
       
       // Reset form
       setResidentName("");
+      setWing("");
       setFlatNumber("");
       setPurpose("");
       setVisitDate("");
@@ -54,6 +64,11 @@ export default function VisitorScreen() {
     signOut();
     router.replace("/sign-in");
   };
+
+  // Filter only approved visits for this visitor
+  const approvedVisits = visitors.filter(visit => 
+    visit.status === "approved" && visit.name === user?.fullName
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -95,12 +110,24 @@ export default function VisitorScreen() {
             />
           </View>
 
+          <Text style={styles.formLabel}>Wing</Text>
+          <View style={styles.inputContainer}>
+            <Home size={20} color="#666" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Enter wing (e.g., A, B, C)"
+              value={wing}
+              onChangeText={setWing}
+              editable={!isLoading}
+            />
+          </View>
+
           <Text style={styles.formLabel}>Flat Number</Text>
           <View style={styles.inputContainer}>
             <Home size={20} color="#666" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
-              placeholder="Enter flat number (e.g., A-101)"
+              placeholder="Enter flat number (e.g., 101, 202)"
               value={flatNumber}
               onChangeText={setFlatNumber}
               editable={!isLoading}
@@ -158,10 +185,45 @@ export default function VisitorScreen() {
 
         <View style={styles.upcomingVisitsContainer}>
           <Text style={styles.sectionTitle}>Your Upcoming Visits</Text>
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>No upcoming visits</Text>
-            <Text style={styles.emptyStateSubtext}>Your approved visits will appear here</Text>
-          </View>
+          
+          {isLoading ? (
+            <ActivityIndicator size="large" color="#3b5998" style={styles.loadingIndicator} />
+          ) : approvedVisits.length > 0 ? (
+            approvedVisits.map(visit => (
+              <View key={visit.id} style={styles.visitCard}>
+                <View style={styles.visitHeader}>
+                  <Text style={styles.visitTitle}>Visit to {visit.visiting}</Text>
+                  <View style={styles.statusBadge}>
+                    <Text style={styles.statusText}>Approved</Text>
+                  </View>
+                </View>
+                <View style={styles.visitDetail}>
+                  <Home size={16} color="#666" />
+                  <Text style={styles.visitDetailText}>
+                    {visit.wing ? `Wing ${visit.wing}, ` : ""}
+                    Flat: {visit.flat}
+                  </Text>
+                </View>
+                <View style={styles.visitDetail}>
+                  <Briefcase size={16} color="#666" />
+                  <Text style={styles.visitDetailText}>{visit.purpose}</Text>
+                </View>
+                <View style={styles.visitDetail}>
+                  <Calendar size={16} color="#666" />
+                  <Text style={styles.visitDetailText}>{visit.date}</Text>
+                </View>
+                <View style={styles.visitDetail}>
+                  <Clock size={16} color="#666" />
+                  <Text style={styles.visitDetailText}>{visit.time}</Text>
+                </View>
+              </View>
+            ))
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyStateText}>No upcoming visits</Text>
+              <Text style={styles.emptyStateSubtext}>Your approved visits will appear here</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -272,6 +334,47 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#333",
     marginBottom: 16,
+  },
+  loadingIndicator: {
+    marginVertical: 20,
+  },
+  visitCard: {
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 12,
+  },
+  visitHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  visitTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+  },
+  statusBadge: {
+    backgroundColor: "#d1fae5",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#10b981",
+  },
+  visitDetail: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+    gap: 8,
+  },
+  visitDetailText: {
+    fontSize: 14,
+    color: "#666",
   },
   emptyState: {
     alignItems: "center",

@@ -1,0 +1,42 @@
+export const mockNotifications = [
+    {
+      id: "1",
+      title: "Visitor Approved",
+      message: "Your visitor Emily Davis has been approved for entry on 26 Apr 2025.",
+      time: "2 hours ago",
+      type: "success",
+      read: false,
+    },
+    {
+      id: "2",
+      title: "Maintenance Notice",
+      message: "Water supply will be interrupted on 28 Apr from 10:00 AM to 2:00 PM due to maintenance work.",
+      time: "Yesterday",
+      type: "info",
+      read: false,
+    },
+    {
+      id: "3",
+      title: "Complaint Update",
+      message: "Your complaint regarding the elevator has been addressed. Please check and confirm.",
+      time: "2 days ago",
+      type: "info",
+      read: true,
+    },
+    {
+      id: "4",
+      title: "Payment Due",
+      message: "Your maintenance fee for April 2025 is due. Please make the payment before 30 Apr.",
+      time: "3 days ago",
+      type: "alert",
+      read: false,
+    },
+    {
+      id: "5",
+      title: "New Notice",
+      message: "Annual general meeting will be held on 15 May 2025 at 6:00 PM in the community hall.",
+      time: "1 week ago",
+      type: "info",
+      read: true,
+    },
+  ];

@@ -30,7 +30,7 @@ export const useDueStore = create<DueState>((set) => ({
 
     try {
       set({ isLoading: true, error: null });
-      const data = await api.dues.getAll(user.token);
+      const data = await api.dues.getById(user.id ,user.token);
       set({ dues: data, isLoading: false });
     } catch (error) {
       set({ 

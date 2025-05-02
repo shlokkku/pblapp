@@ -41,6 +41,7 @@ export default function RegisterScreen() {
       await registerVisitor({
         name: visitorName,
         visiting: user?.fullName || "Resident",
+        wing: user?.wing || "",
         flat: user?.flatNumber || "Unknown",
         purpose: visitorPurpose,
         date: visitDate,
